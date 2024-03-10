@@ -1,0 +1,127 @@
+<div class="background"></div>
+    <div class="container">
+    <div id="register">
+        <input type="text" id="username" name="username" class="form-input" autocomplete="off" placeholder="Enter username">
+    </div>
+    <ul id="user_list" class="user-list d-none">
+        <li>Online users:</li>
+    </ul>
+    <div id="chat_container" class="after-regist d-none">
+        <form action="" id="form_chat">
+            <div class="header">
+                <p>Message</p>
+                <p id="indicator" class="reconn">Reconnecting</p>
+            </div>
+            <input type="text" name="message" id="message" autocomplete="false" class="form-input" placeholder="Send happy feeling to everyone...">
+        </form>
+        <div id="chatbox" class="chatbox">
+            
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/reconnecting-websocket.min.js"></script>
+
+<script>
+    let usernameField = document.getElementById("username");
+    let registContainer = document.getElementById("register");
+    let chatboxContainer = document.getElementById("chat_container");
+    let chatbox = document.getElementById("chatbox");
+    let userList = document.getElementById("user_list");
+    let messageField = document.getElementById("message");
+    let indicator = document.getElementById("indicator");
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        socket = new ReconnectingWebSocket("ws://localhost:3000/gocha")
+
+        socket.onopen = () => {
+            indicator.innerHTML = "Online";
+            indicator.className = ""
+            indicator.classList.add("online");
+            console.log("Successfully connected");
+        }
+
+        socket.onclose = () => {
+            indicator.innerHTML = "Offline";
+            indicator.className = ""
+            indicator.classList.add("offline");
+            console.log("Connection closed");
+        }
+
+        socket.onerror = error => {
+            indicator.innerHTML = "Reconnecting";
+            indicator.className = ""
+            indicator.classList.add("reconn");
+            console.log("there was an error");
+        }
+
+        socket.onmessage = msg => {
+            let data = JSON.parse(msg.data);
+            switch(data.action){
+                case "list_users":
+                    updateUserList(data.connected_users);
+                case "left":
+                    updateUserList(data.connected_users);
+                case "broadcast":
+                    let el = document.createElement("div");
+                    el.classList.add("chat-item");
+                    el.innerHTML = data.message
+                    chatbox.appendChild(el);
+                    chatbox.scrollTop = chatbox.scrollHeight;
+            }
+        }
+
+        usernameField.addEventListener("change", function(event) {
+            let jsonData = {
+                action: "username",
+                username: this.value
+            }
+
+            socket.send(JSON.stringify(jsonData))
+
+            registContainer.classList.add("d-none");
+            chatboxContainer.classList.remove("d-none");
+            userList.classList.remove("d-none");
+        })
+
+        messageField.addEventListener("keydown", function(e) {
+            if(e.code == "Enter"){
+                if(!socket){
+                    console.log("no connection");
+                    return false;
+                }
+                e.preventDefault();
+                e.stopPropagation();
+                sendMessage();
+            }
+        })
+    })
+
+    window.onbeforeunload = function () {
+        console.log("Leaving");
+        let jsonData = {};
+
+        jsonData.action = "left";
+        socket.send(JSON.stringify(jsonData));
+    }
+
+    function sendMessage(){
+        let jsonData = {};
+
+        jsonData.action = "broadcast";
+        jsonData.username = usernameField.value;
+        jsonData.message = messageField.value;
+
+        socket.send(JSON.stringify(jsonData));
+        messageField.value = "";
+    }
+
+    function updateUserList(connectedUsers){
+        userList.innerHTML = `<li>Online users:</li>`;
+        connectedUsers.forEach(user => {
+            let el = document.createElement("li");
+            el.appendChild(document.createTextNode(user));
+            userList.appendChild(el);
+        })
+    }
+</script>

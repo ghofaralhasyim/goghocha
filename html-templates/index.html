@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goghocha</title>
+    <link rel="stylesheet" href="./assets/main.css">
+    <style>
+        .container {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100%;
+            z-index: 1;
+            position: relative;
+        }
+
+        .background::before,
+        .background::after {
+            content: '';
+            position: absolute;
+            z-index: 0;
+            opacity:0.5
+        }
+
+        .background::before {
+            background: #05f7ff50;
+            border-radius: 50%;
+            width: 50vw;
+            height: 50vw;
+            margin-left: -200px;
+            filter:blur(200px);  
+            top: calc(50vh - 50vw/2);
+            left: calc(50vw );
+        }
+        .form-input {
+            border: none;
+            min-height: 30px;
+            border-radius: 8px;
+            background-color: transparent;
+            color: #5adbd9;
+            padding: 10px 20px;
+            border: 1px solid #ffffff30;
+        }
+        .after-regist, .user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 600px;
+            height: 400px;
+            display: flex;
+            padding: 24px;
+            background: rgba( 255, 255, 255, 0.05 );
+            backdrop-filter: blur( 1.5px );
+            -webkit-backdrop-filter: blur( 5px );
+            border-radius: 10px;
+        }
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+        }
+        .user-list ul li {
+            display: inline;
+            margin-right: 12px;
+        }
+        #form_chat {
+           width: 100%;
+           display: flex;
+           flex-direction: column;
+        }
+        .chatbox {
+            height: 100%;
+            border-radius: 10px;
+            border: 1px solid #ffffff30;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            overflow-y: auto;
+        }
+        .chatbox .chat-item {
+            display: flex;
+            gap: 12px;
+        }
+        .chatbox .user {
+            color: cyan;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 16px;
+        }
+        .header p {
+            margin: 0;
+            padding: 0;
+        }
+        #indicator::before {
+            content: "";
+            width: 12px;
+            height: 12px;
+            top: 3px;
+            border-radius: 100%;
+            position: absolute;
+            
+        }
+        #indicator.online::before {
+            background: green;
+            right: 52px;
+        }
+        #indicator.offline::before {
+            background: red;
+            right: 52px;
+        }
+        #indicator.reconn::before {
+            background: yellow;
+            right: 96px;
+        }
+        .d-none {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="container">
+        <form action="post" id="register" class="d-none">
+            <input type="text" id="username" name="username" class="form-input" autocomplete="off" placeholder="Enter username">
+        </form>
+        <div class="user-list">
+        <ul>
+            <li>Online users:</li>
+            <li>Alvin</li>
+            <li>Juan</li>
+        </ul>
+       </div>
+       <div class="after-regist">
+            <form action="post" id="form_chat">
+                <div class="header">
+                    <p>Message</p>
+                    <p id="indicator" class="reconn">Reconnecting</p>
+                </div>
+                <input type="text" name="message" id="message" autocomplete="false" class="form-input" placeholder="Send happy feeling to everyone...">
+            </form>
+            <div class="chatbox">
+                <div class="chat-item">
+                    <span class="user">Juan :</span>
+                    <span class="message">Hello everyone!</span>
+                </div>
+                 <div class="chat-item">
+                    <span class="user">Juan :</span>
+                    <span class="message">Hello everyone!</span>
+                </div>
+            </div>
+       </div>
+    </div>
+
+    <script>
+        let usernameField = document.getElementById("username");
+        let formRegis = document.getElementById("register");
+
+        document.addEventListener("DOMContentLoaded", function() {
+            usernameField.addEventListener("change", function(event) {
+                let payload = {
+                    username : this.value
+                }
+                formRegis.classList.add("d-none");
+            })
+        })
+
+    </script>
+</body>
+</html>
