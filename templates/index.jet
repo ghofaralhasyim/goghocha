@@ -1,31 +1,35 @@
 <div class="background"></div>
-    <div class="container">
-    <div id="register">
+
+<div id="register" class="container">
+    <div>
         <input type="text" id="username" name="username" class="form-input" autocomplete="off" placeholder="Enter username">
     </div>
-    <ul id="user_list" class="user-list d-none">
-        <li>Online users:</li>
-    </ul>
-    <div id="chat_container" class="after-regist d-none">
-        <form action="" id="form_chat">
+</div>
+<div id="dashboard_container" class="dashboard-container d-none">
+    <div id="user_list" class="monitor-container">
+        
+    </div>
+    <div id="chat_container" class="chat-container bg-blur">
+        <div id="form_chat">
             <div class="header">
                 <p>Message</p>
                 <p id="indicator" class="reconn">Reconnecting</p>
             </div>
             <input type="text" name="message" id="message" autocomplete="false" class="form-input" placeholder="Send happy feeling to everyone...">
-        </form>
+        </div>
         <div id="chatbox" class="chatbox">
             
         </div>
     </div>
 </div>
 
+
 <script src="/static/js/reconnecting-websocket.min.js"></script>
 
 <script>
     let usernameField = document.getElementById("username");
     let registContainer = document.getElementById("register");
-    let chatboxContainer = document.getElementById("chat_container");
+    let chatboxContainer = document.getElementById("dashboard_container");
     let chatbox = document.getElementById("chatbox");
     let userList = document.getElementById("user_list");
     let messageField = document.getElementById("message");
@@ -59,15 +63,22 @@
             let data = JSON.parse(msg.data);
             switch(data.action){
                 case "list_users":
+                    console.log(data);
                     updateUserList(data.connected_users);
-                case "left":
-                    updateUserList(data.connected_users);
+                    break;
                 case "broadcast":
-                    let el = document.createElement("div");
-                    el.classList.add("chat-item");
-                    el.innerHTML = data.message
-                    chatbox.appendChild(el);
+                    console.log(data);
+                    createChatNode(data.message)
                     chatbox.scrollTop = chatbox.scrollHeight;
+                    break;
+                case "left":
+                    console.log(data);
+                    updateUserLeft(data.connected_users);
+                    break;
+                case "app_info":
+                    console.log(data);
+                    updateAppInfo(data.message);
+                    break;
             }
         }
 
@@ -116,12 +127,41 @@
         messageField.value = "";
     }
 
+    function createChatNode(message) {
+        let el = document.createElement("div");
+        el.classList.add("chat-item");
+        el.innerHTML = message;
+        chatbox.appendChild(el);
+    }
+
     function updateUserList(connectedUsers){
-        userList.innerHTML = `<li>Online users:</li>`;
+        userList.innerHTML = "";
         connectedUsers.forEach(user => {
-            let el = document.createElement("li");
-            el.appendChild(document.createTextNode(user));
+            let app = user.current_app ? user.current_app : "(Connected on browser)";
+            let el = document.createElement("div");
+            el.setAttribute("id", user.username);
+            el.classList.add("monitor");
+            el.classList.add("bg-blur");
+            el.innerHTML = `<div class="char"><img src="/static/img/Pixilart - flappy bird gif.gif" alt=""></div><div class="info"><h4>${user.username}</h4><div class="app">Focused App: ${app}</div></div>`
             userList.appendChild(el);
+        })
+    }
+
+    function updateAppInfo(message) {
+        let info = message.split(",");
+        let el = userList.querySelector(`#${info[0]} .app`);
+        el.innerHTML = info[1];
+    }
+
+    function updateUserLeft(connectedUsers) {
+        let monitors = userList.querySelectorAll(".monitor");
+        let users = connectedUsers.map((x) => x.username);
+        monitors.forEach(el => {
+            let id = el.getAttribute("id");
+            if(!users.includes(id)) {
+                createChatNode(`${id} was left the gang.`);
+                el.remove();
+            }
         })
     }
 </script>

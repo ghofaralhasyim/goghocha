@@ -1,6 +1,7 @@
 * {
     box-sizing: border-box;
 }
+
 html, body {
     margin: 0;
     padding: 0;
@@ -12,12 +13,16 @@ ul, li {
     padding: 0;
     margin: 0;
 }
+h1, h2, h3, h4, h5 {
+    padding: 0;
+    margin: 0;
+}
 .container {
     display: flex;
     gap: 16px;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
+    flex-direction: row;
     min-height: 100vh;
     width: 100%;
     z-index: 1;
@@ -51,12 +56,14 @@ ul, li {
     padding: 10px 20px;
     border: 1px solid #ffffff30;
 }
-.after-regist, .user-list {
+.chat-container {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    width: 600px;
-    height: 400px;
+    width: 450px;
+    height: 400px; 
+}
+.bg-blur {
     display: flex;
     padding: 24px;
     background: rgba( 255, 255, 255, 0.05 );
@@ -66,9 +73,12 @@ ul, li {
 }
 .user-list {
     display: flex;
+    flex-direction: column;
     height: fit-content;
-    flex-direction: row;
-    gap: 12px;
+}
+.user-list ul li {
+    display: inline;
+    margin-right: 12px;
 }
 #form_chat {
     width: 100%;
@@ -121,6 +131,49 @@ ul, li {
 #indicator.reconn::before {
     background: yellow;
     right: 96px;
+}
+.dashboard-container {
+    width: 100%;
+    max-width: 93%;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 32px 0;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    position: relative;
+    gap: 16px;
+}
+.monitor-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    position: relative;
+    gap: 16px;
+    height: fit-content;
+}
+@media (max-width: 1024px) {
+    .monitor-container {
+        grid-template-columns: 1fr;
+    }
+}
+.monitor-container .monitor {
+    height: fit-content;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+}
+.monitor-container .monitor .char img {
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+}
+.monitor-container .monitor .info {
+    display: flex;
+    flex-direction: column;
+}
+.monitor-container .monitor .info h4 {
+    margin-bottom: 4px;
 }
 .d-none {
     display: none;
